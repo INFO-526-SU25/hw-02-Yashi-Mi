@@ -1,6 +1,6 @@
 ---
 title: "HW 02"
-author: "INSERT YOUR NAME HERE"
+author: "Yashi Mi"
 format: 
   html:
     embed-resources: true
@@ -11,8 +11,34 @@ toc: true
 
 ```{r}
 #| label: label-me-1
+library(dsbox)
+library(tidyverse)
+library(forcats)
+library(ggplot2)
+library(ggridges)
+data(edibnb)
+glimpse(edibnb)
+```
+
+```{r}
+edibnb |>
+  filter(!is.na (neighbourhood), !is.na (review_scores_rating)) |>
+  mutate(neighbourhood = fct_reorder(neighbourhood, review_scores_rating, .fun = median)) |>
+ggplot(aes(x = review_scores_rating, y= neighbourhood))+
+  geom_density_ridges (scale = 4)+
+  labs(title = "Airbnb Review Scores by Neighborhood",
+       x = "Review Score",
+       y = "Neighborhood")+
+  theme_minimal(base_size = 14)
+
+
+
 
 ```
+
+::: callout-note
+This ridgeline plot clearly shows the order of Edinburgh neighborhoods based on their median Airbnb review scores. It also visualizes the distribution of review scores within each neighborhood, helping to identify both the central tendency and variability of ratings. This figure could be useful for potential customers to compare neighborhoods.
+:::
 
 ## 2 - Foreign Connected PACs
 
@@ -23,8 +49,6 @@ toc: true
 
 ## 3 - Median housing prices in the US
 
-
 ## 4 - Expect More. Plot More.
-
 
 ## 5 - Mirror, mirror on the wall, who’s the ugliest of them all?
