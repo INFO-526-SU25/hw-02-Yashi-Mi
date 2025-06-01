@@ -44,8 +44,90 @@ This ridgeline plot clearly shows the order of Edinburgh neighborhoods based on 
 
 ```{r}
 #| label: label-me-2
+library(fs)
+# The following code is cited from the course homework page
+# get a list of files with "Foreign Connected PAC" in their names
+list_of_files <- dir_ls(path = "data", regexp = "Foreign Connected PAC")
 
+# read all files and row bind them
+# keeping track of the file name in a new column called year
+pac <- read_csv(list_of_files, id = "year")
 ```
+
+```{r}
+library(tidyverse)
+library(janitor)
+pac_clean <- pac |>
+  clean_names()
+pac_clean <- pac_clean |>
+   mutate( year = map_chr(year, ~ str_extract_all(.x, "\\d{4}")[[1]][2]),year = as.integer(year))|>
+   mutate(country_of_origin_parent_company = word    (country_of_origin_parent_company,1,sep = "/")) 
+glimpse(pac_clean)
+```
+
+```{r}
+pac_long <- pac_clean |>
+  pivot_longer(cols = c("dems","repubs"),
+              names_to = "party",
+              values_to = "amount")
+glimpse(pac_long)
+```
+
+```{r}
+pac_long <- pac_long |>
+  mutate(amount = as.numeric(gsub("\\$", "", amount)))
+UK <- pac_long |>
+ filter(country_of_origin_parent_company == "UK") |>
+  group_by(year, party)  |>
+  summarise(total_amount_of_contributions = sum(amount,na.rm = TRUE), .groups = "drop")
+glimpse(UK)
+```
+
+```{r}
+library(scales)
+UK |> ggplot(aes(x = year, y = total_amount_of_contributions, color = party))+
+  geom_line(linewidth = 0.8)+
+  labs(x = "Year", y = "Total amount",
+       title = "Contribution to US political partifes from UK-connected PACs", caption = "Source:OpenSecrets.org")+
+  scale_color_manual(values = c("dems" = "blue", "repubs" = "red"),
+                     labels = c("dems" = "Democrat", "repubs" = "Republican"))+
+    scale_y_continuous(labels = scales::label_dollar(scale = 1e-6, suffix = "M"))+
+  theme_minimal(base_size = 14)+
+  theme(legend.position = c(0.85,0.15),
+        axis.title.x = element_text(hjust = 0, size = 11),
+        axis.title.y = element_text(hjust = 0, size = 11),
+        plot.title = element_text(size = 11))
+```
+
+```{r}
+pac_long <- pac_long |>
+  mutate(amount = as.numeric(gsub("\\$", "", amount)))
+Japan <- pac_long |>
+ filter(country_of_origin_parent_company == "Japan") |>
+  group_by(year, party)  |>
+  summarise(total_amount_of_contributions = sum(amount,na.rm = TRUE), .groups = "drop")
+glimpse(Japan)
+```
+
+```{r}
+library(scales)
+Japan |> ggplot(aes(x = year, y = total_amount_of_contributions, color = party))+
+  geom_line(linewidth = 0.8)+
+  labs(x = "Year", y = "Total amount",
+       title = "Contribution to US political partifes from Japan-connected PACs", caption = "Source:OpenSecrets.org")+
+  scale_color_manual(values = c("dems" = "blue", "repubs" = "red"),
+                     labels = c("dems" = "Democrat", "repubs" = "Republican"))+
+    scale_y_continuous(labels = scales::label_dollar(scale = 1e-6, suffix = "M"))+
+  theme_minimal(base_size = 14)+
+  theme(legend.position = c(0.85,0.15),
+        axis.title.x = element_text(hjust = 0, size = 11),
+        axis.title.y = element_text(hjust = 0, size = 11),
+        plot.title = element_text(size = 11))
+```
+
+::: callout-note
+I recreated a similar visualization to analyze Japan-connected PACs' contributions to U.S. political parties over the past 20 years. Overall, Japan’s contributions have steadily increased during this period. Before 2010, contributions to Democrats and Republicans were relatively balanced. However, starting around 2010, there was a noticeable shift: Japan-connected PACs began contributing significantly more to Republican candidates compared to Democrats.
+:::
 
 ## 3 - Median housing prices in the US
 
