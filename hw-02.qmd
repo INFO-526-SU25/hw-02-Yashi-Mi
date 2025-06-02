@@ -52,6 +52,7 @@ list_of_files <- dir_ls(path = "data", regexp = "Foreign Connected PAC")
 # read all files and row bind them
 # keeping track of the file name in a new column called year
 pac <- read_csv(list_of_files, id = "year")
+glimpse(pac)
 ```
 
 ```{r}
@@ -132,5 +133,23 @@ I recreated a similar visualization to analyze Japan-connected PACs' contributio
 ## 3 - Median housing prices in the US
 
 ## 4 - Expect More. Plot More.
+
+```{r}
+library(tidyverse)
+library(ggforce)
+circle1 <- tibble(x_point = 0, y_point = 0, r = 1.5, fill = "#cc0000")
+circle2 <- tibble(x_point = 0, y_point = 0, r = 1, fill = "white")
+circle3 <- tibble(x_point = 0, y_point = 0, r = 0.5, fill = "#cc0000")
+
+ggplot() +
+  geom_circle(data = circle1, aes(x0 = x_point, y0 = y_point,r = r, fill = fill), color = NA)+
+  geom_circle(data = circle2, aes(x0 = x_point, y0 = y_point,r = r, fill = fill), color = NA)+
+  geom_circle(data = circle3, aes(x0 = x_point, y0 = y_point,r = r, fill = fill), color = NA)+
+    scale_fill_identity()+
+    coord_fixed() +
+    theme_void()+
+    annotate("text", x = 0, y = -2, label = "TARGET", size = 6, fontface = "bold", color = "#cc0000")
+
+```
 
 ## 5 - Mirror, mirror on the wall, who’s the ugliest of them all?
