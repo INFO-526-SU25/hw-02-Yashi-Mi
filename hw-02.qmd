@@ -192,6 +192,38 @@ ggplot()+
          panel.grid.major.x = element_blank())
 ```
 
+```{r}
+median_housing_subset <-median_housing|>
+  filter( data >= "2019-01-01" & data <= "2020-12-31")
+glimpse(median_housing_subset)
+median_housing_subset <- median_housing_subset|>
+  mutate(year = year(data), month = month(data),
+  quarter = case_when(month %in% c(1,2,3) ~ "Q1",
+                     month %in% c(4,5,6) ~ "Q2",
+                     month %in% c(7,8,9) ~ "Q3",
+                     TRUE ~ "Q4"),
+  year_quarter = factor(paste(year, quarter), 
+      levels = c("2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4",
+                "2020 Q1", "2020 Q2", "2020 Q3", "2020 Q4")))
+ 
+glimpse(median_housing_subset)
+```
+
+```{r}
+ggplot(median_housing_subset, aes(x = year_quarter, y = price))+
+  geom_line(aes(group = 1),color = "blue")+
+  geom_point( fill = "white", shape = 21, color = "blue" )+
+  scale_y_continuous(breaks = seq(300000,360000,20000), labels = comma) +
+  labs(x = "",
+       y = "Dollars",
+       title = "Median sales price of houses sold in the United States", subtitle = "Not seasonally ajusted")+
+  theme_minimal(base_size = 14)+
+  theme (plot.title = element_text(hjust = 0),
+         plot.subtitle = element_text(hjust = 0),
+         panel.grid.minor = element_blank(),
+         panel.grid.major.x = element_blank())
+```
+
 ## 4 - Expect More. Plot More.
 
 ```{r}
