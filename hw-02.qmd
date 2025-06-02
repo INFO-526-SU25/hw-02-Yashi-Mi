@@ -253,3 +253,24 @@ The function scale_fill_identity() was used to preserve the exact color values, 
 :::
 
 ## 5 - Mirror, mirror on the wall, who’s the ugliest of them all?
+
+```{r}
+library(palmerpenguins)
+penguins <- penguins |>
+  filter(! is.na(flipper_length_mm))
+glimpse(penguins)
+```
+
+```{r}
+ggplot (penguins, aes(x = species,  y = flipper_length_mm))+
+  geom_point()
+  
+```
+
+```{r}
+ggplot (penguins, aes(x = species,  y = flipper_length_mm))+
+  geom_point(color="red", size=8)+
+  theme(panel.background=element_rect(fill="yellow"),
+       panel.grid.major = element_line(color = "blue"),
+       axis.title = element_text(color="green", hjust=1, size = 15))
+```
