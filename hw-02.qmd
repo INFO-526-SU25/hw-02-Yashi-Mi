@@ -132,6 +132,48 @@ I recreated a similar visualization to analyze Japan-connected PACs' contributio
 
 ## 3 - Median housing prices in the US
 
+```{r}
+library(here)
+median_housing <- read_csv(here("data","median-housing.csv"))
+glimpse(median_housing)
+
+recessions <- read_csv(here("data","recessions.csv"))
+glimpse(recessions)
+```
+
+```{r}
+median_housing <- median_housing|>
+  mutate (data = DATE, price = MSPUS)
+glimpse(median_housing)
+```
+
+```{r}
+ggplot(median_housing, aes(x = data, y = price))+
+  geom_line(color = "blue")+
+  scale_y_continuous(breaks = seq(0,400000,40000), labels = comma) +
+  labs(x = "",
+       y = "Dollars",
+       caption = "Sources: Census; HUD",
+       title = "Median sales price of houses sold in the United States", subtitle = "Not seasonally ajusted")+
+  theme_minimal(base_size = 14)+
+  theme (plot.title = element_text(hjust = 0),
+         plot.subtitle = element_text(hjust = 0),
+         panel.grid.minor = element_blank(),
+         panel.grid.major.x = element_blank())
+```
+
+```{r}
+earlist<- min(median_housing$data)
+glimpse(earlist)
+latest<- max(median_housing$data)
+glimpse(latest)
+recessions <- recessions |>
+   mutate(recessions_happened = case_when(
+    Peak <= latest & Trough >= earlist ~ TRUE,
+    TRUE ~ FALSE))
+glimpse(recessions)
+```
+
 ## 4 - Expect More. Plot More.
 
 ```{r}
@@ -140,7 +182,7 @@ library(ggforce)
 circle1 <- tibble(x_point = 0, y_point = 0, r = 1.5, fill = "#cc0000")
 circle2 <- tibble(x_point = 0, y_point = 0, r = 1, fill = "white")
 circle3 <- tibble(x_point = 0, y_point = 0, r = 0.5, fill = "#cc0000")
-
+# target color from "https://www.brandcolorcode.com/target".
 ggplot() +
   geom_circle(data = circle1, aes(x0 = x_point, y0 = y_point,r = r, fill = fill), color = NA)+
   geom_circle(data = circle2, aes(x0 = x_point, y0 = y_point,r = r, fill = fill), color = NA)+
@@ -151,5 +193,13 @@ ggplot() +
     annotate("text", x = 0, y = -2, label = "TARGET", size = 6, fontface = "bold", color = "#cc0000")
 
 ```
+
+::: callout-note
+The first idea that came to mind when recreating the Target logo was to use three circles with different radii. To achieve this, I used geom_circle() from the ggforce package.
+
+First, I created a dataset using tibble, which includes the x and y coordinates, their radii, and fill colors. Then, I used geom_circle() to draw each of the three circles.
+
+The function scale_fill_identity() was used to preserve the exact color values, while coord_fixed() ensured that the x and y axes remained in a 1:1 ratio so the circles were not distorted. I removed all axes and grid lines using theme_void(). Lastly, I added the word “TARGET” below the logo using annotate().
+:::
 
 ## 5 - Mirror, mirror on the wall, who’s the ugliest of them all?
