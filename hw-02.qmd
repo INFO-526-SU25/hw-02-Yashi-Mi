@@ -16,6 +16,7 @@ library(tidyverse)
 library(forcats)
 library(ggplot2)
 library(ggridges)
+library(scales)
 data(edibnb)
 glimpse(edibnb)
 ```
@@ -61,8 +62,9 @@ library(janitor)
 pac_clean <- pac |>
   clean_names()
 pac_clean <- pac_clean |>
-   mutate( year = map_chr(year, ~ str_extract_all(.x, "\\d{4}")[[1]][2]),year = as.integer(year))|>
-   mutate(country_of_origin_parent_company = word    (country_of_origin_parent_company,1,sep = "/")) 
+# Code for extracting years using regex inspired by solutions found online
+   mutate(year = map_chr(year, ~ str_extract_all(.x, "\\d{4}")[[1]][2]),year = as.integer(year))|>
+   mutate(country_of_origin_parent_company = word (country_of_origin_parent_company,1,sep = "/")) 
 glimpse(pac_clean)
 ```
 
@@ -85,16 +87,16 @@ glimpse(UK)
 ```
 
 ```{r}
-library(scales)
+
 UK |> ggplot(aes(x = year, y = total_amount_of_contributions, color = party))+
   geom_line(linewidth = 0.8)+
   labs(x = "Year", y = "Total amount",
        title = "Contribution to US political partifes from UK-connected PACs", caption = "Source:OpenSecrets.org")+
   scale_color_manual(values = c("dems" = "blue", "repubs" = "red"),
                      labels = c("dems" = "Democrat", "repubs" = "Republican"))+
-    scale_y_continuous(labels = scales::label_dollar(scale = 1e-6, suffix = "M"))+
+  scale_y_continuous(labels = label_dollar(scale = 1e-6, suffix = "M"))+
   theme_minimal(base_size = 14)+
-  theme(legend.position = c(0.85,0.15),
+  theme(legend.position.inside = c(0.85,0.15),
         axis.title.x = element_text(hjust = 0, size = 11),
         axis.title.y = element_text(hjust = 0, size = 11),
         plot.title = element_text(size = 11))
@@ -118,9 +120,9 @@ Japan |> ggplot(aes(x = year, y = total_amount_of_contributions, color = party))
        title = "Contribution to US political partifes from Japan-connected PACs", caption = "Source:OpenSecrets.org")+
   scale_color_manual(values = c("dems" = "blue", "repubs" = "red"),
                      labels = c("dems" = "Democrat", "repubs" = "Republican"))+
-    scale_y_continuous(labels = scales::label_dollar(scale = 1e-6, suffix = "M"))+
+    scale_y_continuous(labels = label_dollar(scale = 1e-6, suffix = "M"))+
   theme_minimal(base_size = 14)+
-  theme(legend.position = c(0.85,0.15),
+  theme(legend.position.inside =  c(0.85,0.15),
         axis.title.x = element_text(hjust = 0, size = 11),
         axis.title.y = element_text(hjust = 0, size = 11),
         plot.title = element_text(size = 11))
@@ -149,8 +151,9 @@ glimpse(median_housing)
 
 ```{r}
 ggplot(median_housing, aes(x = data, y = price))+
-  geom_line(color = "blue")+
+  geom_line(color = "blue",linewidth = 0.8)+
   scale_y_continuous(breaks = seq(0,400000,40000), labels = comma) +
+  scale_x_date(date_breaks = "5 years",date_labels = "%Y") +
   labs(x = "",
        y = "Dollars",
        caption = "Sources: Census; HUD",
@@ -181,15 +184,17 @@ ggplot()+
   geom_rect(data = recessions_new,aes(xmin = Peak, xmax = Trough, ymin = -Inf, ymax = Inf), fill = "gray", alpha = 0.5)+
   geom_line(data = median_housing, aes(x = data, y = price), color = "blue")+
   scale_y_continuous(breaks = seq(0,400000,40000), labels = comma) +
+  scale_x_date(date_breaks = "5 years",date_labels = "%Y") +
   labs(x = "",
        y = "Dollars",
-       caption = "Sources: Census; HUD",
+       caption = "Shaded areas indicate U.S. recessions\nSources: Census; HUD",
        title = "Median sales price of houses sold in the United States", subtitle = "Not seasonally ajusted")+
   theme_minimal(base_size = 14)+
   theme (plot.title = element_text(hjust = 0),
          plot.subtitle = element_text(hjust = 0),
          panel.grid.minor = element_blank(),
          panel.grid.major.x = element_blank())
+
 ```
 
 ```{r}
@@ -211,7 +216,7 @@ glimpse(median_housing_subset)
 
 ```{r}
 ggplot(median_housing_subset, aes(x = year_quarter, y = price))+
-  geom_line(aes(group = 1),color = "blue")+
+  geom_line(aes(group = 1),color = "blue" )+
   geom_point( fill = "white", shape = 21, color = "blue" )+
   scale_y_continuous(breaks = seq(300000,360000,20000), labels = comma) +
   labs(x = "",
