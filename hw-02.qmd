@@ -7,16 +7,24 @@ format:
 toc: true
 ---
 
-## 1 - A new day, a new plot, a new geom
+```{r}
+# - loading package manager
+if (!require(pacman))
+  install.packages(pacman)
+
+# - loading required packages
+pacman::p_load(tidyverse,
+               dsbox,
+               forcats,
+               ggplot2,
+               ggridges,
+               scales)
+```
+
+\## 1 - A new day, a new plot, a new geom
 
 ```{r}
 #| label: label-me-1
-library(dsbox)
-library(tidyverse)
-library(forcats)
-library(ggplot2)
-library(ggridges)
-library(scales)
 data(edibnb)
 glimpse(edibnb)
 ```
